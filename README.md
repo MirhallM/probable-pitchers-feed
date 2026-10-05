@@ -2,9 +2,19 @@
 
 Google Apps Script automation for a personal MLB player and team performance tracker built in Google Sheets.
 
-This project started as a personal tool for tracking MLB players and teams in a baseball card-style progression system. As the tracker grew, repetitive calculations, data entry, performance logging, projections, and pitcher scheduling were automated using Google Apps Script.
+This project started as a personal tool for tracking MLB players and teams in a baseball card-style progression system. As the tracker grew, repetitive calculations, performance logging, projections, pitcher scheduling, and data visualization were automated using Google Apps Script.
 
 The goal was to turn a manually maintained spreadsheet into a system that could automatically process performance data and provide useful information for managing the tracker.
+
+## Try the Tracker
+
+The project includes a complete Google Sheets template containing the spreadsheet structure used by the scripts.
+
+**[Copy the MLB Tracker template](https://docs.google.com/spreadsheets/d/1Kf-HcsvgN6VAtmBbptEx5IZORSSZQh5ruAy8xv2Lr68/copy)**
+
+After making a copy, the Apps Script files in this repository can be added to the spreadsheet to reproduce the automation.
+
+> **Note:** The template is provided as a starting point for exploring the project. The Apps Script code is designed around the specific sheet structure, columns, and ranges used by the tracker.
 
 ## Features
 
@@ -25,7 +35,7 @@ The automation can add new player cards to the database and automatically calcul
 - Upgrade priority
 - Estimated games required to reach the card's Rax cap
 
-Player calculations also account for position. Pitchers and position players use different rolling averages and performance thresholds to reflect differences in how frequently they generate performance data.
+Player calculations account for position. Pitchers and position players use different rolling averages and performance thresholds to reflect differences in how frequently they generate performance data.
 
 ### Team Card Management
 
@@ -59,12 +69,12 @@ One of the main automation features is the **Pitcher Calendar**.
 
 The script:
 
-1. Reads the player's database to identify tracked pitchers.
-2. Fetches ESPN's probable starting pitcher information.
+1. Reads the player database to identify tracked pitchers.
+2. Retrieves probable starting pitcher information from ESPN.
 3. Parses the relevant HTML table.
 4. Searches the results for tracked pitchers.
 5. Extracts the scheduled date, opponent, and home/away status.
-6. Writes the matching games to the Pitcher Calendar sheet.
+6. Writes matching games to the Pitcher Calendar sheet.
 7. Sorts the resulting schedule chronologically.
 
 This allows the tracker to automatically identify upcoming games for pitchers that are actually being tracked, rather than requiring the schedule to be entered manually.
@@ -78,13 +88,13 @@ The projection system:
 - Applies card rarity multipliers.
 - Calculates adjusted daily Rax.
 - Accounts for pitcher frequency.
-- Generates cumulative projections for the upcoming days.
+- Generates cumulative projections for upcoming days.
 
 ### Performance Velocity Charts
 
 Historical player performance can be converted into automatically generated line charts.
 
-The script groups performance data by player, creates helper data for the charts, generates a separate chart for each player, and keeps the helper sheet hidden to avoid cluttering the tracker.
+The script groups performance data by player, creates helper data for the charts, generates a chart for each player, positions the charts automatically, and keeps the helper sheet hidden to avoid cluttering the tracker.
 
 ## Card Rarity System
 
@@ -103,6 +113,54 @@ The tracker uses progressively increasing rarity tiers:
 
 These multipliers are used throughout the tracker to adjust player and team performance.
 
+## How the System Works
+
+The tracker is built around several interconnected Google Sheets.
+
+The Apps Script functions act as the automation layer between the user-facing data-entry sheets and the underlying databases.
+
+```text
+                    Google Sheets
+                         │
+        ┌────────────────┴────────────────┐
+        │                                 │
+   Data Entry                       Player / Team
+        │                              Databases
+        ▼                                 │
+Performance Trackers                      │
+        │                                 │
+        └──────────────┬──────────────────┘
+                       ▼
+                Automated Calculations
+                       │
+        ┌──────────────┼──────────────┐
+        │              │              │
+      Rax          Projections    Upgrade Priority
+        │
+        ▼
+ Performance Charts
+```
+
+The pitcher calendar follows a separate workflow:
+
+```text
+Player Card Database
+        │
+        │ tracked pitchers
+        ▼
+ESPN probable
+pitcher information
+        │
+        │ HTML parsing
+        ▼
+  Pitcher Calendar
+        │
+        ├── Date
+        ├── Pitcher
+        ├── Opponent
+        └── Home/Away
+```
+
 ## Technology
 
 - **Google Sheets**
@@ -116,61 +174,19 @@ These multipliers are used throughout the tracker to adjust player and team perf
 ## Repository Structure
 
 ```text
+mlb-tracker-automation/
 ├── Code.gs
 ├── PitcherCalendar.gs
 └── README.md
 ```
 
-`Code.gs` contains the primary tracker automation, including player and team management, performance logging, projections, calculations, and chart generation.
+### `Code.gs`
 
-`PitcherCalendar.gs` contains the automation responsible for retrieving and processing probable starting pitcher information.
+Contains the primary tracker automation, including player and team management, performance logging, calculations, projections, and chart generation.
 
-## How It Works
+### `PitcherCalendar.gs`
 
-The tracker is built around a collection of interconnected Google Sheets.
-
-The Apps Script functions act as the automation layer between the user-facing data-entry sheets and the underlying databases.
-
-For example:
-
-```text
-Data Entry
-    │
-    ├── Player / Team Performance
-    │
-    ▼
-Performance Trackers
-    │
-    ▼
-Player / Team Databases
-    │
-    ├── Rarity
-    ├── Rax Earnings
-    ├── Rolling Averages
-    ├── Upgrade Priority
-    └── Projections
-```
-
-The pitcher calendar follows a separate flow:
-
-```text
-Player Card Database
-        │
-        │ tracked pitchers
-        ▼
-   ESPN probable
-   pitcher information
-        │
-        │ HTML parsing
-        ▼
-  Pitcher Calendar
-        │
-        ├── Date
-        ├── Pitcher
-        ├── Team
-        ├── Opponent
-        └── Home/Away
-```
+Contains the automation responsible for retrieving and processing probable starting pitcher information and updating the Pitcher Calendar.
 
 ## Why I Built It
 
@@ -180,10 +196,26 @@ The tracker originally required a significant amount of manual data entry and re
 
 The project gradually evolved from a spreadsheet into a small data-processing and tracking system with automated calculations, projections, visualizations, and external data retrieval.
 
+## Project Highlights
+
+This project demonstrates several practical programming concepts outside of a traditional application framework:
+
+- Automating repetitive workflows
+- Working with structured spreadsheet data
+- Creating and modifying spreadsheet ranges programmatically
+- Generating formulas dynamically
+- Processing and transforming data
+- Maintaining state across multiple sheets
+- Retrieving external web data
+- Parsing HTML
+- Filtering external data against an internal dataset
+- Generating data visualizations programmatically
+- Designing a system around a personal real-world workflow
+
 ## Notes
 
-The scripts are designed around the structure of the original Google Sheets tracker. The spreadsheet itself is not included in this repository, so the scripts will require the corresponding sheet structure and column names to function as-is.
+The scripts are designed around the structure of the original Google Sheets tracker. The spreadsheet template is provided separately so the project can be explored without requiring the original private tracker.
 
-The ESPN probable pitcher integration depends on the structure of the source page at the time the script was written. Changes to that page's HTML structure may require updates to the parser.
+The probable-pitcher integration depends on the structure of the ESPN page at the time the script was written. Changes to the source page's HTML structure may require updates to the parser.
 
-This repository contains the automation code used for the project; it does not contain private credentials, API keys, authentication information, or private user data.
+This repository contains the automation code used for the project. It does not contain private credentials, API keys, authentication information, or private user data.
